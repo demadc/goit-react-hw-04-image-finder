@@ -1,17 +1,35 @@
 import React, { Component } from 'react';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
+import { getGallery } from 'services/api';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { nanoid } from 'nanoid';
 
 export class App extends Component {
   state = {
     value: '',
     images: [],
-    page: 1,
     loading: false,
+
+    requestId: '',
   };
 
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.value !== this.state.value ||
+      prevState.page !== this.state.page
+    ) {
+      getGallery({ value: this.state.value, requestId: this.state.requestId })
+        .then(response => response.json())
+        .then(images => this.setState({ images }))
+        .catch(error => console.error('Error fetching data:', error));
+    }
+  }
   handleSearch = value => {
-    this.setState({ value });
+    // Генеруємо новий унікальний ідентифікатор
+    const requestId = nanoid();
+    this.setState({ value, requestId });
   };
 
   render() {
@@ -29,6 +47,18 @@ export class App extends Component {
       >
         <Searchbar onSubmit={this.handleSearch} />
         <ImageGallery images={images} />
+        <ToastContainer
+          position="top-right"
+          autoClose={1500}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
         {/* <Loader />
         <Button />
         <Modal></Modal> */}

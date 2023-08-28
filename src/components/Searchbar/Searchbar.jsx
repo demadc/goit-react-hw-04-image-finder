@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Header, Form, Btn, Field } from './Searchbar.styled';
+import { Header, Field, Btn, Form } from './Searchbar.styled';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { BsSearch } from 'react-icons/bs';
@@ -7,39 +7,40 @@ import { BsSearch } from 'react-icons/bs';
 export class Searchbar extends Component {
   state = {
     value: '',
+    page: 1,
   };
 
   // Створюємо методи для контрольованої форми
+
   handleChange = e => {
-    this.setState(e.target.value);
+    this.setState({ value: e.target.value, page: 1 });
   };
 
   handleSubmit = e => {
     e.preventDefault();
     if (this.state.value.trim() === '') {
-      return toast('Enter key words for search');
+      toast('Write some text', {
+        position: 'top-right',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
+      return;
     }
     this.props.onSubmit(this.state.value);
-    this.setState({ value: '' });
+    // this.setState({ value: '' });
   };
-
-  //   toast('Write some text', {
-  // position: "top-center",
-  // autoClose: 2500,
-  // hideProgressBar: false,
-  // closeOnClick: true,
-  // pauseOnHover: true,
-  // draggable: true,
-  // progress: undefined,
-  // theme: "light",
-  // });
 
   render() {
     return (
       <Header>
         <Form onSubmit={this.handleSubmit}>
           <Btn type="submit">
-            <BsSearch size="40" />
+            <BsSearch size="16px" />
           </Btn>
 
           <Field
