@@ -22,7 +22,13 @@ export class App extends Component {
     ) {
       getGallery({ value: this.state.value, requestId: this.state.requestId })
         .then(response => response.json())
-        .then(images => this.setState({ images }))
+        // .then(({ hits }) => this.setState({ images: hits }))
+        .then(images =>
+          // Коли нам потрібно змінити стан від попереднього, ми передаємо не
+          // об'єкт, а колбек ф-ю, в яку ми зберігаємо попередні дані, та
+          // додовати нові при кожному оновленні...
+          this.setState(prevState => ({ images: [...prevState, ...images] }))
+        )
         .catch(error => console.error('Error fetching data:', error));
     }
   }
