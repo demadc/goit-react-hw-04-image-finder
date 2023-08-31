@@ -2,28 +2,27 @@ import React from 'react';
 import { Item, Picture } from './ImageGalleryItem.styled';
 import PropTypes from 'prop-types';
 
-export const ImageGalleryItem = ({ images, alt, src, onImageClick }) => {
-  const { largeImageURL, tags, webformatURL } = images;
+export const ImageGalleryItem = ({ alt, src, openModal, largeImageURL }) => {
+  // const { largeImageURL, tags, webformatURL } = images;
 
   return (
-    <Item
-      onClick={e => {
-        e.preventDefault();
-        onImageClick({ largeImageURL, tags });
-      }}
-    >
+    <Item>
       <div>
-        <Picture src={webformatURL} alt={tags} loading="lazy" />
+        <Picture
+          src={src}
+          alt={alt}
+          onClick={() => openModal(largeImageURL)}
+          loading="lazy"
+        />
       </div>
     </Item>
   );
 };
 
 ImageGalleryItem.propTypes = {
-  image: PropTypes.shape({
-    tags: PropTypes.string.isRequired,
-    webformatURL: PropTypes.string.isRequired,
-    largeImageURL: PropTypes.string.isRequired,
-  }).isRequired,
-  onImageClick: PropTypes.func.isRequired,
+  alt: PropTypes.string.isRequired,
+  src: PropTypes.string.isRequired,
+  largeImageURL: PropTypes.string.isRequired,
+
+  openModal: PropTypes.func.isRequired,
 };

@@ -2,66 +2,82 @@ import React, { Component } from 'react';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { getGallery } from 'services/api';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+
 import { nanoid } from 'nanoid';
+import { Button } from './Button/Button';
+import { Modal } from './Modal/Modal';
+import { Loader } from './Loader/Loader';
 
 export class App extends Component {
   state = {
     value: '',
     images: [],
     loading: false,
+    page: 1,
 
     requestId: '',
+    isLoadMore: false,
+
+    largeImageURL: '',
   };
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(_, prevState) {
+    const { value, page, requestId } = this.state;
     if (
-      prevState.value !== this.state.value ||
-      prevState.page !== this.state.page
+      prevState.value !== value ||
+      prevState.page !== page ||
+      requestId !== prevState.requestId
     ) {
-      getGallery({ value: this.state.value, requestId: this.state.requestId })
-        .then(response => response.json())
-        // .then(({ hits }) => this.setState({ images: hits }))
-        .then(images =>
-          // Коли нам потрібно змінити стан від попереднього, ми передаємо не
-          // об'єкт, а колбек ф-ю, в яку ми зберігаємо попередні дані, та
-          // додовати нові при кожному оновленні...
-          this.setState(prevState => ({ images: [...prevState, ...images] }))
-        )
-        .catch(error => console.error('Error fetching data:', error));
+      this.setState({ loading: true });
+      getGallery(value, page)
+        .then(({ hits, totalHits }) => {
+          this.setState(prevState => {
+            return {
+              images: [...prevState.images, ...hits],
+              isLoadMore: page < Math.ceil(totalHits / 12),
+            };
+          });
+        })
+        .catch(error => console.error('Error fetching data:', error))
+        .finally(() => {
+          this.setState({ loading: false });
+        });
     }
   }
   handleSearch = value => {
     // Генеруємо новий унікальний ідентифікатор
     const requestId = nanoid();
-    this.setState({ value, requestId });
+    this.setState({ value, requestId, page: 1, images: [] });
+  };
+  handleLoadMore = () => {
+    this.setState(prevState => {
+      return {
+        page: prevState.page + 1,
+      };
+    });
+  };
+
+  handleOpenModal = largeImageURL => {
+    this.setState({ largeImageURL });
   };
 
   render() {
-    const { images } = this.state;
-    return (
-      <div
-        style={{
-          height: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontSize: 40,
-          color: '#010101',
-        }}
-      >
-        <Searchbar onSubmit={this.handleSearch} />
-        <ImageGallery images={images} />
-        <ToastContainer position="top-right" autoClose={1500} />
+    const { images, isLoadMore, largeImageURL, loading } = this.state;
 
-        {/* <Loader />
-        <Button />
-        <Modal></Modal> */}
-      </div>
+    return (
+      <>
+        <Searchbar onSubmit={this.handleSearch} />
+        <ImageGallery images={images} openModal={this.handleOpenModal} />
+
+        {isLoadMore && <Button handleLoadMore={this.handleLoadMore} />}
+        {largeImageURL && (
+          <Modal
+            closeModal={this.handleOpenModal}
+            largeImageURL={largeImageURL}
+          />
+        )}
+        {loading && <Loader />}
+      </>
     );
   }
 }
-
-//const BASE_URL = 'https://pixabay.com/api/'
-//const API_KEY = '38277598-05a082c915074d2caf7c5aa6f'

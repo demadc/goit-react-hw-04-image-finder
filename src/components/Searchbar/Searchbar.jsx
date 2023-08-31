@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Header, Field, Btn, Form } from './Searchbar.styled';
 import PropTypes from 'prop-types';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { BsSearch } from 'react-icons/bs';
 
 export class Searchbar extends Component {
@@ -19,9 +19,9 @@ export class Searchbar extends Component {
   handleSubmit = e => {
     e.preventDefault();
     if (this.state.value.trim() === '') {
-      toast('Write some text', {
+      toast.error('Write some text', {
         position: 'top-right',
-        autoClose: 1500,
+        duration: 1500,
       });
       return;
     }

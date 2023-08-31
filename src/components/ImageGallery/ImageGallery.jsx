@@ -3,14 +3,16 @@ import { List } from './ImageGallery.styled';
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
 import PropTypes from 'prop-types';
 
-export const ImageGallery = ({ images }) => {
+export const ImageGallery = ({ images, openModal }) => {
   return (
     <List>
       {images.map(image => (
         <ImageGalleryItem
-          key={image.hits.id}
-          src={image.hits.webformatURL}
-          alt={image.hits.tags}
+          key={image.id}
+          src={image.webformatURL}
+          alt={image.tags}
+          openModal={openModal}
+          largeImageURL={image.largeImageURL}
         />
       ))}
     </List>
