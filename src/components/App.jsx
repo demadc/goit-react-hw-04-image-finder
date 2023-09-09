@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
-// import { getGallery } from 'services/api';
+import { getGallery } from '../services/api';
 
 // import { nanoid } from 'nanoid';
 import { Button } from './Button/Button';
@@ -17,9 +17,6 @@ export const App = () => {
   const [isLoadMore, setIsLoadMore] = useState(false);
   const [largeImageURL, setLargeImageURL] = useState('');
 
-  const API_KEY = '38277598-05a082c915074d2caf7c5aa6f';
-  const BASE_URL = 'https://pixabay.com/api/';
-
   useEffect(() => {
     const fetchData = async () => {
       if (value === '') return;
@@ -27,20 +24,12 @@ export const App = () => {
       setLoading(true);
 
       try {
-        const response = await fetch(
-          `${BASE_URL}?key=${API_KEY}&q=${value}&page=${page}&image_type=photo&per_page=12`
-        );
+        const { hits, totalHits } = await getGallery(value, page);
 
-        if (!response.ok) {
-          throw new Error('Error');
-        }
-
-        const data = await response.json();
-
-        setImages(prevImages => [...prevImages, ...data.hits]);
-        setIsLoadMore(page < Math.ceil(data.totalHits / 12));
+        setImages(prevImages => [...prevImages, ...hits]);
+        setIsLoadMore(page < Math.ceil(totalHits / 12));
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error:', error);
       } finally {
         setLoading(false);
       }
