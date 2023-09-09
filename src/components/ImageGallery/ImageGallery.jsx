@@ -4,6 +4,9 @@ import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
 import PropTypes from 'prop-types';
 
 export const ImageGallery = ({ images, openModal }) => {
+  if (images.length === 0) {
+    return null;
+  }
   return (
     <List>
       {images.map(image => (
