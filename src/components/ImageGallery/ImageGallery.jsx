@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 export const ImageGallery = ({ images, openModal }) => {
   if (images.length === 0) {
-    return null;
+    return <p>No images</p>;
   }
   return (
     <List>
